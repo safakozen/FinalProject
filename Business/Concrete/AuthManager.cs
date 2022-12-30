@@ -38,7 +38,7 @@ namespace Business.Concrete
                 Status = true
             };
             _userService.Add(user);
-            return new SuccessDataResult<User>(user,"a");
+            return new SuccessDataResult<User>(user,"Kayıt Başarılı.");
         }
 
         public IDataResult<User> Login(UserForLoginDto userForLoginDto)
@@ -46,22 +46,22 @@ namespace Business.Concrete
             var userToCheck = _userService.GetByMail(userForLoginDto.Email);
             if (userToCheck == null)
             {
-                return new ErrorDataResult<User>("b");
+                return new ErrorDataResult<User>("Kullanıcı Bulunamadı.");
             }
 
             if (!HashingHelper.VerifyPasswordHash(userForLoginDto.Password, userToCheck.PasswordHash, userToCheck.PasswordSalt))
             {
-                return new ErrorDataResult<User>("b");
+                return new ErrorDataResult<User>("Parola Hatalı.");
             }
 
-            return new SuccessDataResult<User>(userToCheck, "a");
+            return new SuccessDataResult<User>(userToCheck, "Giriş Başarılı.");
         }
 
         public IResult UserExists(string email)
         {
             if (_userService.GetByMail(email) != null)
             {
-                return new ErrorResult("b");
+                return new ErrorResult("Kullanıcı Mevcut.");
             }
             return new SuccessResult();
         }
@@ -70,7 +70,7 @@ namespace Business.Concrete
         {
             var claims = _userService.GetClaims(user);
             var accessToken = _tokenHelper.CreateToken(user, claims);
-            return new SuccessDataResult<AccessToken>(accessToken, "at");
+            return new SuccessDataResult<AccessToken>(accessToken, "Token Oluşturuldu.");
         }
     }
 }
