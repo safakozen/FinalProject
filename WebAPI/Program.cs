@@ -14,6 +14,7 @@ using Core.DependencyResolvers;
 using Business.DependencyResolves.Autofac;
 
 var builder = WebApplication.CreateBuilder(args);
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 // Add services to the container.
 
@@ -25,6 +26,15 @@ builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterMod
 
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:4200/").AllowAnyHeader().AllowAnyOrigin();
+                      });
+});
+//builder.Services.AddCors();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -64,10 +74,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseServiceProviderFactory
+app.ConfigureCustomExceptionMiddleware();
+
+app.UseCors(MyAllowSpecificOrigins);
+
 app.UseHttpsRedirection();
 
-//14.g�n dersinde ekledik
 app.UseAuthentication();
 
 app.UseAuthorization();
